@@ -1,17 +1,27 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"self-study-golang/pkg/server/api"
 )
 
 func main() {
-	handleRequest()
+	log.Fatal(run())
 }
 
-func handleRequest() {
-	http.Handle("/", api.HomepageHandler{})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func run() error {
+
+	r := router()
+	http.Handle("/", r)
+	return http.ListenAndServe(":8080", nil)
+}
+
+func router() *mux.Router {
+	r := mux.NewRouter()
+	r.Handle("/", api.HomepageHandler{})
+	r.HandleFunc("/articles/categories/{category}", api.GetArticleByCategoryHandler)
+	return r
 }
 
