@@ -1,21 +1,24 @@
 package api
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 	"self-study-golang/pkg/article"
 )
 
+/*
+	uses
+	url var: category
+ */
 func GetArticleByCategoryHandler(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 	cat := article.Category(params["category"])
+	var res JsonResponse
 	articles, err := article.LoadCategory(cat)
 	if err != nil {
-		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(err.Error())
-		return
+		res = NewJsonResponse(500, err.Error())
+	} else {
+		res = NewJsonResponse(200, articles )
 	}
-
-	json.NewEncoder(w).Encode(articles)
+	res.WriteTo(w)
 }
